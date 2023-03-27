@@ -4,7 +4,7 @@
 //!
 //! At runtime:
 //! ```
-//! use expr::{Eval, Var};
+//! use dxpr::{Eval, Var};
 //! let expression = -Var(4);
 //! let value = expression.eval();
 //! assert_eq!(-4, value);
@@ -13,7 +13,7 @@
 //! At compile time:
 //! ```
 //! #![feature(const_trait_impl)]
-//! use expr::{ops, Eval, Expr, Var};
+//! use dxpr::{ops, Eval, Expr, Var};
 //! const EXPRESSION: Expr<ops::Neg<Var<i32>>> = -Var(4);
 //! const VALUE: i32 = EXPRESSION.eval();
 //! assert_eq!(-4, VALUE);
