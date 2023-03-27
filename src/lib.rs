@@ -1,10 +1,29 @@
 //! Differentiable expression templates in Rust.
+//!
+//! ### Examples
+//!
+//! At runtime:
+//! ```
+//! use expr::{Eval, Var};
+//! let expression = -Var(4);
+//! let value = expression.eval();
+//! assert_eq!(-4, value);
+//! ```
+//!
+//! At compile time:
+//! ```
+//! #![feature(const_trait_impl)]
+//! use expr::{ops, Eval, Expr, Var};
+//! const EXPRESSION: Expr<ops::Neg<Var<i32>>> = -Var(4);
+//! const VALUE: i32 = EXPRESSION.eval();
+//! assert_eq!(-4, VALUE);
+//! ```
 
 #![deny(warnings, missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(const_precise_live_drops, const_trait_impl)]
 
-mod ops;
+pub mod ops;
 
 /// Trait analogous to a function: an output type and a callable, `eval`.
 #[const_trait]
@@ -28,7 +47,7 @@ impl<T: ~const Eval> const Eval for Expr<T> {
 
 /// Not only a value but a unique identifier w.r.t. which we can differentiate.
 #[derive(Debug)]
-pub struct Var<T>(T);
+pub struct Var<T>(pub T);
 impl<T> const Eval for Var<T> {
     type EvalOutput = T;
     #[inline(always)]

@@ -1,8 +1,12 @@
+//! Mathematical operations as trees.
+//! Evaluation traverses depth-first and folds into a value.
+
 use crate::*;
 
 macro_rules! unary_op {
-    ($Name:ident, $name:ident) => {
+    ($Name:ident, $name:ident, $doc:literal) => {
         #[derive(Debug)]
+        #[doc = $doc]
         pub struct $Name<T: ~const Eval>(T)
         where
             T::EvalOutput: ~const core::ops::$Name;
@@ -36,5 +40,5 @@ macro_rules! unary_op {
     };
 }
 
-unary_op!(Neg, neg);
-unary_op!(Not, not);
+unary_op!(Neg, neg, "Arithmetic negation (e.g. `-4`).");
+unary_op!(Not, not, "Logical negation (e.g. `!true`).");
