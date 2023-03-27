@@ -4,6 +4,7 @@ set -eu
 
 rustup toolchain install nightly
 rustup component add clippy --toolchain nightly
+cargo install rustfilt
 
 export RUSTFLAGS='-Copt-level=0 -g'
 
