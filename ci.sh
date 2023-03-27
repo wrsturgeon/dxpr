@@ -2,6 +2,8 @@
 
 set -eu
 
+rustup component add clippy --toolchain nightly
+
 export RUSTFLAGS='-Copt-level=0 -g'
 
 export CARGOFLAGS='--features=std'
