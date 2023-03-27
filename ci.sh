@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -eu
 
 export RUSTFLAGS='-Copt-level=0 -g'
