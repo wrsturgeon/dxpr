@@ -2,6 +2,7 @@
 
 set -eu
 
+rustup toolchain install nightly
 rustup component add clippy --toolchain nightly
 
 export RUSTFLAGS='-Copt-level=0 -g'
