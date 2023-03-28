@@ -4,7 +4,7 @@ Differentiable expression templates in Rust.
 ## Use
 
 At runtime:
-```
+```rust
 use dxpr::{Eval, Var};
 let expression = -Var(4);
 let value = expression.eval();
@@ -12,7 +12,7 @@ assert_eq!(-4, value);
 ```
 
 At compile time:
-```
+```rust
 #![feature(const_trait_impl)]
 use dxpr::{ops, Eval, Expr, Var};
 const EXPRESSION: Expr<ops::Neg<Var<i32>>> = -Var(4);
