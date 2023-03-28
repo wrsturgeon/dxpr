@@ -16,7 +16,7 @@ impl<T: ~const Eval> const Eval for Expr<T> {
 impl<T: ~const EvalRef> const EvalRef for Expr<T> {
     #[inline(always)]
     fn eval(&self) -> Self::EvalOutput {
-        #[allow(clippy::needless_borrow)] // Hey! Tell the clippy team about this! :)
+        #[allow(clippy::needless_borrow)] // TODO: Hey! Tell the clippy team about this! :)
         (&self.0).eval()
     }
 }

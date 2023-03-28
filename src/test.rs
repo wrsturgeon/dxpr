@@ -108,6 +108,25 @@ fn grad_tautological_other_runtime() {
     let x = 1;
     let y = 1; // same value!
     let g = var(&x).grad(&y);
-    let v: &i32 = g.eval();
+    let v: &i32 = g.eval(); // TODO: research and/or ask: why is the type annotation necessary?
     assert_eq!(0, *v);
 }
+
+// TODO: investigate the below!
+
+// #[test]
+// fn grad_tautological_self_comptime() {
+//     const X: i32 = 1;
+//     const G: Expr<&i32> = var(&X).grad(&X);
+//     const V: &i32 = G.eval();
+//     assert_eq!(1, *V);
+// }
+
+// #[test]
+// fn grad_tautological_other_comptime() {
+//     const X: i32 = 1;
+//     const Y: i32 = 1; // same value!
+//     const G: Expr<&i32> = var(&X).grad(&Y);
+//     const V: &i32 = G.eval();
+//     assert_eq!(0, *V);
+// }

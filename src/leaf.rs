@@ -1,6 +1,6 @@
 //! Trait to provide analogies to 0 (`ZERO`) and 1 (`UNIT`).
 
-use crate::{Eval, EvalRef, Expr, Grad};
+use crate::{Eval, EvalRef, Grad};
 
 /// Analogies to 0 (`ZERO`) and 1 (`UNIT`).
 pub trait Leaf {
@@ -25,13 +25,13 @@ impl<T: Leaf> const EvalRef for &T {
     }
 }
 
-impl<T: Leaf> Grad for &T {
-    type GradOutput = Expr<<T as Leaf>::LeafOutput>;
+impl<T: Leaf> const Grad for &T {
+    type GradOutput = <T as Leaf>::LeafOutput;
     fn grad<U>(self, x: &U) -> Self::GradOutput {
         match (x as *const U).guaranteed_eq(self as *const _ as *const U) {
-            None => panic!(),
-            Some(false) => Expr(T::ZERO),
-            Some(true) => Expr(T::UNIT),
+            None => panic!("Couldn't tell whether two values were the same (this often happens at compile time and seems to be an issue with Rust itself)"),
+            Some(false) => T::ZERO,
+            Some(true) => T::UNIT,
         }
     }
 }

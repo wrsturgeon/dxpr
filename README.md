@@ -40,6 +40,5 @@ assert_eq!(-4, expression.eval());
 ```
 
 ## To do:
+- Differentiation on arbitrary expressions
 - `Index` and `RangeBound` operators (i.e. `a[b]` and `a..b`)
-- Figure out if we can force Rust to compare pointers at compile time
-- Differentiate
