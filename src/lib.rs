@@ -5,7 +5,8 @@
 //! At runtime:
 //! ```rust
 //! use dxpr::{Eval, Var};
-//! let a = Var(4);
+//! let x = 4;
+//! let a = Var(&x);
 //! let expression = -a;
 //! let value = expression.eval();
 //! assert_eq!(-4, value);
@@ -15,23 +16,27 @@
 //! ```rust
 //! #![feature(const_trait_impl)]
 //! use dxpr::{ops, Eval, Expr, Var};
-//! const A: Var<i32> = Var(4);
+//! const X: i32 = 4;
+//! const A: Var<i32> = Var(&X);
 //! const EXPRESSION: Expr<ops::Neg<Var<i32>>> = -A;
 //! const VALUE: i32 = EXPRESSION.eval();
 //! assert_eq!(-4, VALUE);
 //! ```
 //!
-//! Reusing an expression without copying (e.g. for machine learning) requires only that all variables _refer_ to values rather than hold them (look for `Var(&...`):
+//! We can reuse an expression without copying (e.g. for machine learning) by calling `eval` on a reference:
 //! ```rust
-//! use dxpr::{ops, EvalRef, Expr, Var};
-//! let a = 4;
-//! let b = Var(&a);
-//! let expression: Expr<ops::Neg<Var<&i32>>> = -b;
+//! use dxpr::{ops, Eval, EvalRef, Expr, Var};
+//! let x = 4;
+//! let a = Var(&x);
+//! let expression: Expr<ops::Neg<Var<i32>>> = -a;
 //! assert_eq!(-4, (&expression).eval());
 //! assert_eq!(-4, (&expression).eval());
 //! assert_eq!(-4, (&expression).eval());
-//! // still movable the last time, but `a` sticks around
+//! // still movable the last time:
 //! assert_eq!(-4, expression.eval());
+//! // can't use it again:    ------ `expression` moved due to this method call
+//! // /* bad! */ assert_eq!(-4, expression.eval());
+//! //                           ^^^^^^^^^^ value used here after move
 //! ```
 
 #![deny(warnings, missing_docs)]
@@ -75,15 +80,15 @@ impl<T: ~const EvalRef> const EvalRef for Expr<T> {
 
 /// Not only a value but a unique identifier w.r.t. which we can differentiate.
 #[derive(Debug)]
-pub struct Var<T>(pub T);
-impl<T> const Eval for Var<T> {
-    type EvalOutput = T;
+pub struct Var<'a, T>(pub &'a T);
+impl<'a, T> const Eval for Var<'a, T> {
+    type EvalOutput = &'a T;
     #[inline(always)]
     fn eval(self) -> Self::EvalOutput {
         self.0
     }
 }
-impl<T> const EvalRef for Var<&T> {
+impl<'a, T> const EvalRef for Var<'a, T> {
     #[inline(always)]
     fn eval(&self) -> Self::EvalOutput {
         self.0

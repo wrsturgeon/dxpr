@@ -3,79 +3,79 @@ use crate::*;
 #[cfg(feature = "std")]
 #[test]
 fn dbg_var() {
-    dbg!(Var(4));
+    dbg!(Var(&4));
 }
 
 #[cfg(feature = "std")]
 #[test]
 fn dbg_expr() {
-    dbg!(Expr(Var(4)));
+    dbg!(Expr(Var(&4)));
 }
 
 #[cfg(feature = "std")]
 #[test]
 fn dbg_neg() {
-    dbg!(-Var(4));
+    dbg!(-Var(&4));
 }
 
 #[cfg(feature = "std")]
 #[test]
 fn dbg_not() {
-    dbg!(!Var(false));
+    dbg!(!Var(&false));
 }
 
 #[test]
 fn eval_var() {
-    assert_eq!(4, Var(4).eval())
+    assert_eq!(4, *Var(&4).eval())
 }
 
 #[test]
 fn const_eval_var() {
-    const VALUE: i32 = Var(4).eval();
+    const VALUE: i32 = *Var(&4).eval();
     assert_eq!(4, VALUE);
 }
 
 #[test]
 fn eval_expr() {
-    assert_eq!(4, Expr(Var(4)).eval())
+    assert_eq!(4, *Expr(Var(&4)).eval())
 }
 
 #[test]
 fn const_eval_expr() {
-    const VALUE: i32 = Expr(Var(4)).eval();
+    const VALUE: i32 = *Expr(Var(&4)).eval();
     assert_eq!(4, VALUE);
 }
 
 #[test]
 fn neg_var() {
-    assert_eq!(-4, (-Var(4)).eval());
+    assert_eq!(-4, (-Var(&4)).eval());
 }
 
 #[test]
 fn const_neg_var() {
-    const VALUE: i32 = (-Var(4)).eval();
+    const VALUE: i32 = (-Var(&4)).eval();
     assert_eq!(-4, VALUE);
 }
 
 #[test]
 fn neg_expr() {
-    assert_eq!(4, (--Var(4)).eval());
+    assert_eq!(4, (--Var(&4)).eval());
 }
 
 #[test]
 fn const_neg_expr() {
-    const VALUE: i32 = (--Var(4)).eval();
+    const VALUE: i32 = (--Var(&4)).eval();
     assert_eq!(4, VALUE);
 }
 
 #[test]
 fn not_var() {
-    assert_eq!(false, (!Var(true)).eval());
+    assert_eq!(false, (!Var(&true)).eval());
 }
 
 #[test]
 fn not_expr() {
-    assert_eq!(true, (!!Var(true)).eval());
+    assert_eq!(true, (!!Var(&true)).eval());
 }
 
 #[test]
@@ -83,4 +83,14 @@ fn eval_twice() {
     let expr = --Var(&4);
     (&expr).eval();
     expr.eval();
+}
+
+#[test]
+fn add_var() {
+    assert_eq!(3, (Var(&1) + Var(&2)).eval());
+}
+
+#[test]
+fn add_expr() {
+    assert_eq!(15, ((Var(&1) + Var(&2)) + (Var(&4) + Var(&8))).eval());
 }
