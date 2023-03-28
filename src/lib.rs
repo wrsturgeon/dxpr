@@ -1,6 +1,6 @@
 //! Differentiable expression templates in Rust.
 //!
-//! ### Examples
+//! ## Examples
 //!
 //! At runtime:
 //! ```rust
@@ -28,7 +28,7 @@
 //! use dxpr::{ops, Eval, EvalRef, Expr, Var};
 //! let x = 4;
 //! let a = Var(&x);
-//! let expression: Expr<ops::Neg<Var<i32>>> = -a;
+//! let expression = -a;
 //! assert_eq!(-4, (&expression).eval());
 //! assert_eq!(-4, (&expression).eval());
 //! assert_eq!(-4, (&expression).eval());

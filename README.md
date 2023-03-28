@@ -1,7 +1,7 @@
 # dxpr
 Differentiable expression templates in Rust.
 
-## Use
+## Examples
 
 At runtime:
 ```rust
@@ -28,7 +28,7 @@ We can reuse an expression without copying (e.g. for machine learning) by callin
 ```rust
 use dxpr::{ops, Eval, EvalRef, Expr, Var};
 let x = 4;
-let expression: Expr<ops::Neg<Var<i32>>> = -Var(&x);
+let expression = -Var(&x);
 assert_eq!(-4, (&expression).eval());
 assert_eq!(-4, (&expression).eval());
 assert_eq!(-4, (&expression).eval());
