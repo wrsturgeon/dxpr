@@ -24,6 +24,17 @@ const VALUE: i32 = EXPRESSION.eval();
 assert_eq!(-4, VALUE);
 ```
 
+Automatic differentiation:
+```rust   
+use dxpr::{var, Eval, Grad};
+let a = 4;
+let b = 4;
+let ga = (var(&a) - var(&b)).grad(&a);
+let gb = (var(&a) - var(&b)).grad(&b);
+assert_eq!(1, ga.eval());
+assert_eq!(-1, gb.eval());
+```
+
 We can reuse an expression without copying (e.g. for machine learning) by calling `eval` on a reference:
 ```rust
 use dxpr::{ops, Eval, EvalRef, Expr, var};

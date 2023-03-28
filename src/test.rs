@@ -130,3 +130,32 @@ fn grad_tautological_other_runtime() {
 //     const V: &i32 = G.eval();
 //     assert_eq!(0, *V);
 // }
+
+#[test]
+fn grad_add_runtime() {
+    let a = 4;
+    let b = 4;
+    let ga = (var(&a) + var(&b)).grad(&a);
+    let gb = (var(&a) + var(&b)).grad(&b);
+    assert_eq!(1, ga.eval());
+    assert_eq!(1, gb.eval());
+}
+
+#[test]
+fn grad_sub_runtime() {
+    let a = 4;
+    let b = 4;
+    let ga = (var(&a) - var(&b)).grad(&a);
+    let gb = (var(&a) - var(&b)).grad(&b);
+    assert_eq!(1, ga.eval());
+    assert_eq!(-1, gb.eval());
+}
+
+// TODO:
+// #[test]
+// fn grad_mul_by_constant() {
+//     (var(&2) * var(&1)).eval();
+//     (2 * var(&1)).eval();
+//     let x = 4;
+//     (var(&2) * var(&x)).grad(&x);
+// }
