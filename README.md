@@ -5,9 +5,9 @@ Differentiable expression templates in Rust.
 
 At runtime:
 ```rust
-use dxpr::{Eval, Var};
+use dxpr::{Eval, var};
 let x = 4;
-let a = Var(&x);
+let a = var(&x);
 let expression = -a;
 let value = expression.eval();
 assert_eq!(-4, value);
@@ -16,19 +16,19 @@ assert_eq!(-4, value);
 At compile time:
 ```rust
 #![feature(const_trait_impl)]
-use dxpr::{ops, Eval, Expr, Var};
+use dxpr::{ops, Eval, Expr, var};
 const X: i32 = 4;
-const A: Var<i32> = Var(&X);
-const EXPRESSION: Expr<ops::Neg<Var<i32>>> = -A;
+const A: Expr<&i32> = var(&X);
+const EXPRESSION: Expr<ops::Neg<Expr<&i32>>> = -A;
 const VALUE: i32 = EXPRESSION.eval();
 assert_eq!(-4, VALUE);
 ```
 
 We can reuse an expression without copying (e.g. for machine learning) by calling `eval` on a reference:
 ```rust
-use dxpr::{ops, Eval, EvalRef, Expr, Var};
+use dxpr::{ops, Eval, EvalRef, Expr, var};
 let x = 4;
-let expression = -Var(&x);
+let expression = -var(&x);
 assert_eq!(-4, (&expression).eval());
 assert_eq!(-4, (&expression).eval());
 assert_eq!(-4, (&expression).eval());

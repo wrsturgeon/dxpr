@@ -7,6 +7,7 @@ echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
 
 export PROFDATA=.coverage/all.profdata
 export REPORT=.coverage/report.out
+export SHOW=.coverage/show.out
 mkdir -p .coverage
 set +u
 if [ -z "${RUSTFLAGS}" ]; then echo '\033[0;1;31mWarning: ${RUSTFLAGS} is empty!\033[0m'; export RUSTFLAGS=''; else echo 'Note: ${RUSTFLAGS}='"'${RUSTFLAGS}'"; fi
@@ -33,9 +34,8 @@ llvm-cov report \
     ${TESTEXEC} \
     ${TESTFLAG} \
     > ${REPORT}
-cat ${REPORT} # for the user
 export PERCENT=$(cat ${REPORT} | grep '%' | tail -n 1 | cut -d '%' -f 1 | rev | cut -d ' ' -f 1 | rev)
-echo "Tests cover ${PERCENT}% of all source code"
+echo "Tests ostensibly cover ${PERCENT}% of all source code"
 if [ "${PERCENT}" = "100.00" ]
 then
     echo "Good to go!"
@@ -50,6 +50,6 @@ else
         ${TESTFLAG} \
         --show-line-counts-or-regions \
         --show-branches=count \
-        #| less -R
+        > ${SHOW}
     # exit 1
 fi

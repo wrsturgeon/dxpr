@@ -8,16 +8,6 @@ macro_rules! unary_op {
         #[derive(Debug)]
         #[doc = $doc]
         pub struct $Name<T: ~const Eval>(T);
-        impl<'a, T> const core::ops::$Name for Var<'a, T>
-        where
-            <Self as Eval>::EvalOutput: ~const core::ops::$Name,
-        {
-            type Output = Expr<$Name<Self>>;
-            #[inline(always)]
-            fn $name(self) -> Self::Output {
-                Expr($Name(self))
-            }
-        }
         impl<T: ~const Eval> const core::ops::$Name for Expr<T>
         where
             T::EvalOutput: ~const core::ops::$Name,
@@ -55,16 +45,6 @@ macro_rules! binary_op {
         #[derive(Debug)]
         #[doc = $doc]
         pub struct $Name<L: ~const Eval, R: ~const Eval>(L, R);
-        impl<'a, L, R: ~const Eval> const core::ops::$Name<R> for Var<'a, L>
-        where
-            <Self as Eval>::EvalOutput: ~const core::ops::$Name<R::EvalOutput>,
-        {
-            type Output = Expr<$Name<Self, R>>;
-            #[inline(always)]
-            fn $name(self, arg: R) -> Self::Output {
-                Expr($Name(self, arg))
-            }
-        }
         impl<L: ~const Eval, R: ~const Eval> const core::ops::$Name<R> for Expr<L>
         where
             L::EvalOutput: ~const core::ops::$Name<R::EvalOutput>,
