@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{expr::Expr, ops, prelude::*};
 
 #[cfg(feature = "std")]
 #[test]

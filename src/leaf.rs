@@ -1,33 +1,37 @@
 //! Trait to provide analogies to 0 (`ZERO`) and 1 (`UNIT`).
 
-use crate::{Eval, EvalRef, Grad};
+use crate::{eval, eval::Eval, grad, grad::Grad};
 
 /// Analogies to 0 (`ZERO`) and 1 (`UNIT`).
 pub trait Leaf {
     /// Type of `UNIT` and `ZERO`.
-    type LeafOutput: ~const crate::Eval;
+    type Output: ~const Eval;
     /// Analogous to 1.
-    const UNIT: Self::LeafOutput;
+    const UNIT: Self::Output;
     /// Analogous to 0.
-    const ZERO: Self::LeafOutput;
+    const ZERO: Self::Output;
 }
 
-impl<T: Leaf> const Eval for &T {
-    type EvalOutput = Self;
-    fn eval(self) -> Self::EvalOutput {
+impl<T: Leaf> const eval::Typed for &T {
+    type Output = Self;
+}
+impl<T: Leaf> const eval::Own for &T {
+    fn eval(self) -> <Self as eval::Typed>::Output {
         self
     }
 }
-
-impl<T: Leaf> const EvalRef for &T {
-    fn eval(&self) -> Self::EvalOutput {
+impl<T: Leaf> const eval::Ref for &T {
+    fn eval(&self) -> <Self as eval::Typed>::Output {
         self
     }
 }
+impl<T: Leaf> const Eval for &T {}
 
-impl<T: Leaf> const Grad for &T {
-    type GradOutput = <T as Leaf>::LeafOutput;
-    fn grad<U>(self, x: &U) -> Self::GradOutput {
+impl<T: Leaf> const grad::Typed for &T {
+    type Output = <T as Leaf>::Output;
+}
+impl<T: Leaf> const grad::Own for &T {
+    fn grad<U>(self, x: &U) -> <Self as grad::Typed>::Output {
         match (x as *const U).guaranteed_eq(self as *const _ as *const U) {
             None => panic!("Couldn't tell whether two values were the same (this often happens at compile time and seems to be an issue with Rust itself)"),
             Some(false) => T::ZERO,
@@ -35,13 +39,23 @@ impl<T: Leaf> const Grad for &T {
         }
     }
 }
+impl<T: Leaf> const grad::Ref for &T {
+    fn grad<U>(&self, x: &U) -> <Self as grad::Typed>::Output {
+        match (x as *const U).guaranteed_eq(self as *const _ as *const U) {
+            None => panic!("Couldn't tell whether two values were the same (this often happens at compile time and seems to be an issue with Rust itself)"),
+            Some(false) => T::ZERO,
+            Some(true) => T::UNIT,
+        }
+    }
+}
+impl<T: Leaf> const Grad for &T {}
 
 macro_rules! impl_leaf {
     ($t:ident, $z:expr, $u:expr) => {
         impl Leaf for $t {
-            type LeafOutput = &'static Self;
-            const UNIT: Self::LeafOutput = &$u;
-            const ZERO: Self::LeafOutput = &$z;
+            type Output = &'static Self;
+            const UNIT: Self::Output = &$u;
+            const ZERO: Self::Output = &$z;
         }
     };
 }
