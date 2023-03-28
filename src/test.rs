@@ -77,3 +77,10 @@ fn not_var() {
 fn not_expr() {
     assert_eq!(true, (!!Var(true)).eval());
 }
+
+#[test]
+fn eval_twice() {
+    let expr = --Var(&4);
+    (&expr).eval();
+    expr.eval();
+}

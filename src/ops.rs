@@ -37,6 +37,15 @@ macro_rules! unary_op {
                 core::ops::$Name::$name(self.0.eval())
             }
         }
+        impl<T: ~const EvalRef> const EvalRef for $Name<T>
+        where
+            T::EvalOutput: ~const core::ops::$Name,
+        {
+            #[inline(always)]
+            fn eval(&self) -> Self::EvalOutput {
+                core::ops::$Name::$name(EvalRef::eval(&self.0))
+            }
+        }
     };
 }
 
