@@ -1,5 +1,12 @@
 //! Mathematical operations as trees.
 //! Evaluation traverses depth-first and folds into a value.
+//!
+//! NOTE: Rust's orphan rule creates the need to wrap everything in `Expr`.
+//! We would be able to define addition between traits e.g. in C++,
+//! but since addition isn't defined in this crate (it's in `core`),
+//! Rust prevents us from blanket-implementing it in this crate.
+//! But we can always get away with keeping `Expr` wrapping only the outer layer:
+//! every time we add an operation to the tree, keep only its `self.0`.
 
 use crate::{eval, eval::Eval, expr::Expr, grad, grad::Grad};
 
@@ -12,10 +19,10 @@ macro_rules! unary_op {
         where
             <T as eval::Typed>::Output: ~const core::ops::$Name,
         {
-            type Output = Expr<$Name<Self>>;
+            type Output = Expr<$Name<T>>;
             #[inline(always)]
             fn $name(self) -> Self::Output {
-                Expr($Name(self))
+                Expr($Name(self.0))
             }
         }
         impl<T: ~const Eval> const eval::Typed for $Name<T>
@@ -63,6 +70,7 @@ macro_rules! unary_grad {
             <T as eval::Typed>::Output: ~const core::ops::$Name,
             <<T as grad::Typed>::Output as eval::Typed>::Output: ~const core::ops::$Diff,
         {
+            #[inline(always)]
             fn grad<U>(self, x: &U) -> <Self as grad::Typed>::Output {
                 $Diff(self.0.grad(x))
             }
@@ -72,6 +80,7 @@ macro_rules! unary_grad {
             <T as eval::Typed>::Output: ~const core::ops::$Name,
             <<T as grad::Typed>::Output as eval::Typed>::Output: ~const core::ops::$Diff,
         {
+            #[inline(always)]
             fn grad<U>(&self, x: &U) -> <Self as grad::Typed>::Output {
                 $Diff((&self.0).grad(x))
             }
@@ -90,14 +99,14 @@ macro_rules! binary_op {
         #[derive(Debug)]
         #[doc = $doc]
         pub struct $Name<L: ~const Eval, R: ~const Eval>(L, R);
-        impl<L: ~const Eval, R: ~const Eval> const core::ops::$Name<R> for Expr<L>
+        impl<L: ~const Eval, R: ~const Eval> const core::ops::$Name<Expr<R>> for Expr<L>
         where
             <L as eval::Typed>::Output: ~const core::ops::$Name<<R as eval::Typed>::Output>,
         {
-            type Output = Expr<$Name<Self, R>>;
+            type Output = Expr<$Name<L, R>>;
             #[inline(always)]
-            fn $name(self, arg: R) -> Self::Output {
-                Expr($Name(self, arg))
+            fn $name(self, arg: Expr<R>) -> Self::Output {
+                Expr($Name(self.0, arg.0))
             }
         }
         impl<L: ~const Eval, R: ~const Eval> const eval::Typed for $Name<L, R>
@@ -149,6 +158,7 @@ macro_rules! binary_grad {
             <<L as grad::Typed>::Output as eval::Typed>::Output:
                 ~const core::ops::$Diff<<<R as grad::Typed>::Output as eval::Typed>::Output>,
         {
+            #[inline(always)]
             fn grad<U>(self, x: &U) -> <Self as grad::Typed>::Output {
                 $Diff(self.0.grad(x), self.1.grad(x))
             }
@@ -159,6 +169,7 @@ macro_rules! binary_grad {
             <<L as grad::Typed>::Output as eval::Typed>::Output:
                 ~const core::ops::$Diff<<<R as grad::Typed>::Output as eval::Typed>::Output>,
         {
+            #[inline(always)]
             fn grad<U>(&self, x: &U) -> <Self as grad::Typed>::Output {
                 $Diff((&self.0).grad(x), (&self.1).grad(x))
             }

@@ -37,3 +37,63 @@ pub trait Ref: ~const Typed {
 /// Automatically differentiate an expression, optionally at compile time (if evaluated into a `const`).
 #[const_trait]
 pub trait Grad: ~const Own + ~const Ref {}
+
+/// Automagically implement `Grad`.
+#[macro_export]
+macro_rules! implement_grad {
+    ($name:ty >-> $output:ty: |$self:ident| $body:expr) => {
+        impl const $crate::grad::Typed for $name {
+            type Output = $output;
+        }
+        impl const $crate::grad::Own for $name {
+            #[inline(always)]
+            fn grad($self) -> $output {
+                $body
+            }
+        }
+        impl const $crate::grad::Ref for $name {
+            #[inline(always)]
+            fn grad(&$self) -> $output {
+                $body
+            }
+        }
+        impl const Grad for $name {}
+    };
+    ($t:ident: $const_trait:ident => $name:ty >-> $output:ty: |$self:ident| $body:expr) => {
+        impl<$t: ~const $const_trait> const $crate::grad::Typed for $name {
+            type Output = $output;
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Own for $name {
+            #[inline(always)]
+            fn grad($self) -> $output {
+                $body
+            }
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Ref for $name {
+            #[inline(always)]
+            fn grad(&$self) -> $output {
+                $body
+            }
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Grad for $name {}
+    };
+    // It would be so nice to have `where` as a parallel to C++'s `if constexpr`...
+    ($t:ident: $const_trait:ident => $name:ty >-> $output:ty: |$self:ident, $x:ident| where own { $own:expr } else { $ref:expr }) => {
+        impl<$t: ~const $const_trait> const $crate::grad::Typed for $name {
+            type Output = $output;
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Own for $name {
+            #[inline(always)]
+            fn grad<U>($self, $x: &U) -> $output {
+                $own
+            }
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Ref for $name {
+            #[inline(always)]
+            fn grad<U>(&$self, $x: &U) -> $output {
+                $ref
+            }
+        }
+        impl<$t: ~const $const_trait> const $crate::grad::Grad for $name {}
+    };
+}

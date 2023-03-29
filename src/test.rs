@@ -80,7 +80,7 @@ fn not_expr() {
 
 #[test]
 fn eval_twice() {
-    let expr: Expr<ops::Neg<Expr<ops::Neg<Expr<&i32>>>>> = --var(&4);
+    let expr: Expr<ops::Neg<ops::Neg<&i32>>> = --var(&4);
     (&expr).eval();
     expr.eval();
 }
