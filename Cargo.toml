@@ -1,6 +1,6 @@
 [package]
 name = "dxpr"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Will Sturgeon <willstrgn@gmail.com>"]
 edition = "2021"
 description = "Differentiable expression templates in compile-time, dependency-free, no_std Rust."
