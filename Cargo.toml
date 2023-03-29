@@ -1,10 +1,12 @@
 [package]
 name = "dxpr"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Will Sturgeon <willstrgn@gmail.com>"]
 edition = "2021"
 description = "Differentiable expression templates in compile-time, dependency-free, no_std Rust."
+documentation = "https://docs.rs/dxpr/latest/dxpr/"
 readme = "README.md"
+homepage = "https://crates.io/crates/dxpr"
 repository = "https://github.com/wrsturgeon/dxpr"
 license = "Zlib"
 # license-file = "LICENSE"
@@ -33,3 +35,6 @@ resolver = "2"
 [features]
 default = ["std"]
 std = []
+
+[badges]
+maintenance = { status = "actively-developed" }
