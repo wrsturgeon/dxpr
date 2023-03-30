@@ -41,9 +41,15 @@
 //! // Either way, your `build.rs` could easily evaluate an arbitrary expression and write it, unevaluated, to a file.
 //! ```
 
-#![deny(warnings, missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(const_precise_live_drops, const_raw_ptr_comparison, const_trait_impl)]
+#![deny(warnings, missing_docs)]
+#![allow(clippy::needless_borrow)] // TODO: let Clippy team know
+#![feature(
+    associated_type_bounds,
+    const_precise_live_drops,
+    const_raw_ptr_comparison,
+    const_trait_impl
+)]
 
 pub mod eval;
 pub mod expr;

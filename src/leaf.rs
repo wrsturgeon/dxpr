@@ -6,27 +6,21 @@ use crate::{eval::Eval, grad, grad::Grad};
 #[const_trait]
 pub trait Leaf {
     /// Type of `UNIT` and `ZERO`.
-    type Output;
+    type Unit;
     /// Analogous to 1.
-    const UNIT: Self::Output;
+    const UNIT: Self::Unit;
     /// Analogous to 0.
-    const ZERO: Self::Output;
+    const ZERO: Self::Unit;
 }
 
 crate::implement_eval!(T: Leaf => &T >-> Self: |self| self);
 
-impl<T: ~const Leaf> const grad::Typed for &T
-where
-    <T as Leaf>::Output: ~const Eval,
-{
-    type Output = <T as Leaf>::Output;
+impl<T: ~const Leaf<Unit: ~const Eval>> const grad::Typed for &T {
+    type Differentiated = T::Unit;
 }
-impl<T: ~const Leaf> const grad::Own for &T
-where
-    <T as Leaf>::Output: ~const Eval,
-{
+impl<T: ~const Leaf<Unit: ~const Eval>> const grad::Own for &T {
     #[inline(always)]
-    fn grad<U>(self, x: &U) -> <Self as grad::Typed>::Output {
+    fn grad<U>(self, x: &U) -> Self::Differentiated {
         match (x as *const U as *const T).guaranteed_eq(self as *const T) {
             None => panic!("Couldn't tell whether two values were the same (this often happens at compile time and seems to be an issue with Rust itself)"),
             Some(false) => T::ZERO,
@@ -34,12 +28,9 @@ where
         }
     }
 }
-impl<T: ~const Leaf> const grad::Ref for &T
-where
-    <T as Leaf>::Output: ~const Eval,
-{
+impl<T: ~const Leaf<Unit: ~const Eval>> const grad::Ref for &T {
     #[inline(always)]
-    fn grad<U>(&self, x: &U) -> <Self as grad::Typed>::Output {
+    fn grad<U>(&self, x: &U) -> Self::Differentiated {
         match (x as *const U as *const T).guaranteed_eq(*self as *const T) {
             None => panic!("Couldn't tell whether two values were the same (this often happens at compile time and seems to be an issue with Rust itself)"),
             Some(false) => T::ZERO,
@@ -47,15 +38,15 @@ where
         }
     }
 }
-impl<T: ~const Leaf> const Grad for &T where <T as Leaf>::Output: ~const Eval {}
+impl<T: ~const Leaf<Unit: ~const Eval>> const Grad for &T {}
 
 /// Automagically implement `Leaf`.
 macro_rules! implement_leaf {
     ($t:ty, $z:expr, $u:expr) => {
         impl const Leaf for $t {
-            type Output = &'static Self;
-            const UNIT: Self::Output = &$u;
-            const ZERO: Self::Output = &$z;
+            type Unit = &'static Self;
+            const UNIT: Self::Unit = &$u;
+            const ZERO: Self::Unit = &$z;
         }
     };
 }

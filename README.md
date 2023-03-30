@@ -43,6 +43,6 @@ assert_eq!(-4, VALUE);
 ```
 
 ## To do:
-- Allow `where` clauses in `implement...!` macros
+- Figure out why Rust doesn't like `+` in macro `:path` arguments
 - Interoperability with builtin constants
 - `Index` and `RangeBound` operators (i.e. `a[b]` and `a..b`)

@@ -151,6 +151,15 @@ fn grad_sub_runtime() {
     assert_eq!(-1, gb.eval());
 }
 
+// #[test]
+// fn grad_mul_runtime() {
+//     let a = 37;
+//     let b = 42;
+//     let expr = var(&a) * var(&b);
+//     assert_eq!(42, (&expr).grad(&a).eval());
+//     assert_eq!(37, expr.grad(&b).eval());
+// }
+
 // TODO:
 // #[test]
 // fn grad_mul_by_constant() {
